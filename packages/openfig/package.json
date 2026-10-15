@@ -1,0 +1,19 @@
+{
+  "name": "openfig-cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "openfig": "./src/cli.mjs"
+  },
+  "scripts": {
+    "serve": "node src/cli.mjs serve"
+  },
+  "dependencies": {
+    "@grida/canvas-wasm": "link:vendor/canvas-wasm",
+    "@grida/refig": "link:vendor/refig",
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "fontkit": "^2.0.4",
+    "yazl": "^3.3.1"
+  }
+}

@@ -1,0 +1,7 @@
+[
+  { "family": "Inter", "file": "Inter.ttf", "style": "normal", "weight": "100 900" },
+  { "family": "Inter", "file": "Inter-Italic.ttf", "style": "italic", "weight": "100 900" },
+  { "family": "Mukta", "file": "Mukta-Regular.ttf", "style": "normal", "weight": 400 },
+  { "family": "Mukta", "file": "Mukta-Medium.ttf", "style": "normal", "weight": 500 },
+  { "family": "Mukta", "file": "Mukta-SemiBold.ttf", "style": "normal", "weight": 600 }
+]
