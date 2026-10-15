@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "package": {
+    "name": "@grida/canvas-wasm",
+    "version": "0.91.0-canary.22",
+    "wasmSha256": "de9ea26c673238392cc48beeaa9962999d23fda2a8d46f229ecac8f67a1e085d",
+    "packageTarballSha1": "35cbcdab127d849a9708e7bae623532359443390",
+    "packageTarballUrl": "https://registry.npmjs.org/@grida/canvas-wasm/-/canvas-wasm-0.91.0-canary.22.tgz"
+  },
+  "comparisonMethod": "Decode the active WASM data segments at their declared linear memory offsets, then locate each complete upstream font file byte for byte in that memory.",
+  "activeDataSegments": 13539,
+  "passiveDataSegments": 0,
+  "sourceRevisionForFontBytes": "9159de1c84f936e501309fd6c965eafd8e5bce22",
+  "sourceRevisionScope": "The package metadata does not identify its engine build commit. This public source revision supplies font files that match the packaged runtime memory byte for byte.",
+  "fonts": [
+    {
+      "family": "Geist",
+      "bytes": 148832,
+      "sha256": "7bc3b18ac53fc4fd6ab7abc177e04e3a674b2ae7d69cf209691c406c659ab747",
+      "linearMemoryOffset": 275029,
+      "sourceUrl": "https://raw.githubusercontent.com/gridaco/grida/9159de1c84f936e501309fd6c965eafd8e5bce22/crates/grida/assets/fonts/Geist/Geist-VariableFont_wght.ttf"
+    },
+    {
+      "family": "Geist Mono",
+      "bytes": 137804,
+      "sha256": "5dd4720ae4e3848e8ca860703f0c8138a9a3aa599c2e7f6305a558af223a9d3b",
+      "linearMemoryOffset": 423866,
+      "sourceUrl": "https://raw.githubusercontent.com/gridaco/grida/9159de1c84f936e501309fd6c965eafd8e5bce22/crates/grida/assets/fonts/GeistMono/GeistMono-VariableFont_wght.ttf"
+    }
+  ],
+  "license": {
+    "identifier": "OFL-1.1",
+    "copyright": "Copyright 2024 The Geist Project Authors (https://github.com/vercel/geist-font.git)",
+    "noticeFile": "packages/openfig/vendor/canvas-wasm/GEIST-OFL.txt",
+    "noticeSha256": "0acca17d633ecc7180aa12d8a60a95889d87a439cb83884597ff278046743dcb",
+    "sourceUrls": [
+      "https://raw.githubusercontent.com/gridaco/grida/9159de1c84f936e501309fd6c965eafd8e5bce22/crates/grida/assets/fonts/Geist/OFL.txt",
+      "https://raw.githubusercontent.com/gridaco/grida/9159de1c84f936e501309fd6c965eafd8e5bce22/crates/grida/assets/fonts/GeistMono/OFL.txt"
+    ]
+  },
+  "note": "These font files are embedded in the third-party canvas runtime. User-supplied converter font files and manifests are separate.",
+  "checkedUtc": "2026-10-15T05:20:37.786139+00:00"
+}

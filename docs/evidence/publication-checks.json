@@ -1,0 +1,165 @@
+{
+  "checkedAt": "2026-10-15T05:16:37.919Z",
+  "scope": "Original generated demo on an isolated local server, after publication source corrections. No font manifest supplied. Not a Figma fidelity measurement.",
+  "commands": [
+    "pnpm build",
+    "node --check packages/openfig/src/server.mjs",
+    "node scripts/create-demo.mjs --output <new-demo.fig>",
+    "node packages/openfig/src/cli.mjs convert <demo.fig> --output <new-demo.html> --fonts <empty-directory>"
+  ],
+  "results": [
+    {
+      "operation": "CLI and direct HTTP conversion with no font manifest",
+      "status": 200,
+      "nodeCount": 92,
+      "htmlBytes": 182446,
+      "sha256": "3602486296d33eab42fce5dbe74436dbdc475bfaca68afb6f71b8eb667fcaf40",
+      "byteIdentical": true
+    },
+    {
+      "operation": "Document upload",
+      "status": 201,
+      "nodeCount": 92,
+      "pageCount": 1
+    },
+    {
+      "operation": "/healthz",
+      "status": 200,
+      "jsonObject": true
+    },
+    {
+      "operation": "/api/tools",
+      "status": 200,
+      "jsonObject": true
+    },
+    {
+      "operation": "/api/documents",
+      "status": 200,
+      "jsonObject": true
+    },
+    {
+      "operation": "/api/documents/:id/metadata",
+      "status": 200,
+      "jsonObject": true
+    },
+    {
+      "operation": "/api/documents/:id/nodes?query=New%20project",
+      "status": 200,
+      "jsonObject": true
+    },
+    {
+      "operation": "/api/documents/:id/tokens",
+      "status": 200,
+      "jsonObject": true
+    },
+    {
+      "operation": "/api/documents/:id/assets",
+      "status": 200,
+      "jsonObject": true
+    },
+    {
+      "operation": "MCP tools/list",
+      "status": 200,
+      "toolNames": [
+        "list_frames",
+        "list_frame_summaries",
+        "search_nodes",
+        "get_node_context",
+        "get_frame_bundle",
+        "review_visual_match",
+        "get_vector_svg",
+        "get_style_tokens",
+        "get_asset",
+        "inspect_node"
+      ]
+    },
+    {
+      "operation": "MCP inspect_node on demo layer",
+      "status": 200,
+      "isError": false
+    },
+    {
+      "operation": "Delete document session",
+      "status": 200
+    }
+  ],
+  "hostChecks": {
+    "checkedAt": "2026-10-15T05:18:58.493Z",
+    "cases": [
+      {
+        "bind": "127.0.0.1",
+        "requestHost": "review.invalid",
+        "origin": "http://review.invalid",
+        "status": 403
+      },
+      {
+        "bind": "127.0.0.1",
+        "requestHost": "localhost",
+        "origin": "http://localhost",
+        "status": 200
+      },
+      {
+        "bind": "127.0.0.1",
+        "requestHost": "[",
+        "status": 400
+      },
+      {
+        "bind": "LOCALHOST",
+        "requestHost": "review.invalid",
+        "origin": "http://review.invalid",
+        "status": 403
+      },
+      {
+        "bind": "LOCALHOST",
+        "requestHost": "localhost",
+        "origin": "http://localhost",
+        "status": 200
+      },
+      {
+        "bind": "LOCALHOST",
+        "requestHost": "[",
+        "status": 400
+      },
+      {
+        "bind": "::1",
+        "requestHost": "review.invalid",
+        "origin": "http://review.invalid",
+        "status": 403
+      },
+      {
+        "bind": "::1",
+        "requestHost": "localhost",
+        "origin": "http://localhost",
+        "status": 200
+      },
+      {
+        "bind": "::1",
+        "requestHost": "[",
+        "status": 400
+      },
+      {
+        "bind": "::ffff:127.0.0.1",
+        "requestHost": "review.invalid",
+        "origin": "http://review.invalid",
+        "status": 403
+      },
+      {
+        "bind": "::ffff:127.0.0.1",
+        "requestHost": "localhost",
+        "origin": "http://localhost",
+        "status": 200
+      },
+      {
+        "bind": "::ffff:127.0.0.1",
+        "requestHost": "[",
+        "status": 400
+      },
+      {
+        "bind": "0.0.0.0",
+        "requestHost": "review.invalid",
+        "origin": "http://review.invalid",
+        "status": 200
+      }
+    ]
+  }
+}
