@@ -1,0 +1,15 @@
+{
+  "name": "openfig",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.6.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present run build",
+    "openfig": "node packages/openfig/src/cli.mjs",
+    "dev": "node scripts/dev.mjs"
+  }
+}

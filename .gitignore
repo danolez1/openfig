@@ -1,0 +1,16 @@
+node_modules/
+dist/
+# These linked runtime packages are required by the converter.
+!packages/openfig/vendor/refig/dist/
+!packages/openfig/vendor/refig/dist/**
+!packages/openfig/vendor/canvas-wasm/dist/
+!packages/openfig/vendor/canvas-wasm/dist/**
+.openfig/
+.figctx/
+*.fig
+packages/openfig/fonts/local/
+packages/openfig/output/
+.venv/
+
+.DS_Store
+docs/artifacts/
