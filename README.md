@@ -1,34 +1,16 @@
-VERIFIED against the source and measurement references below.
+<!-- VERIFIED: usage grounded in package.json, scripts/dev.mjs, packages/openfig/src/cli.mjs, pipeline.mjs and server.mjs. -->
 
 # Openfig
 
-Openfig opens a saved Figma Design `.fig` file as an interactive canvas and exports it as one self-contained HTML file. Select screens or layers, inspect design values, and copy CSS, the styling rules used by web pages, from the Design panel.
+Open a local Figma `.fig` file in your browser. Explore its pages, select layers, inspect styles and copy them as CSS for web pages. Export the canvas as a standalone HTML file, or extract the design data for scripts and coding assistants.
 
-One `bun dev` command starts the app, design inspection, command-line interface (CLI) operations, and local Model Context Protocol (MCP) tools on port 8787. MCP lets compatible coding assistants inspect the document through structured tool calls. Conversion reads local files without Figma sign-in. Live Figma account tools use a separate hosted connection; see [the MCP guide](docs/FIGMA-MCP.md).
+Local file processing works without a Figma account.
 
-![Openfig canvas with a selected layer, source geometry and CSS inspector](docs/images/openfig-canvas.png)
+![Openfig showing a design canvas, layer tree and CSS inspector](docs/images/openfig-canvas.png)
 
-The screenshot shows an original demonstration board rendered in the app. You can generate the same board locally. The benchmark design and the optional user-supplied font collection stay local.
+## Run locally
 
-## What you can do
-
-- Open a local Figma save without signing into Figma.
-- Navigate pages and screens, search layers, select components, and inspect source geometry, paints and typography.
-- Pan across the canvas, zoom around the pointer, and focus a screen or selection.
-- Copy a layer's CSS and download a standalone interactive HTML file.
-- Extract a structured bundle containing nodes, tokens, assets, variables and geometry.
-- Use document inspection and conversion through the CLI, an HTTP application programming interface (API), or local MCP tools.
-
-## Start the app
-
-Requirements:
-
-- Node.js 22 or newer
-- pnpm 11.6.0
-- Python 3 with Pillow 12.3.0
-- Bun for the `bun dev` launcher
-
-Install dependencies once, then start from the repository root:
+You'll need Node.js 22 or newer, pnpm 11.6.0, Python 3 and Bun. Run these commands from the repository root:
 
 ```sh
 python3 -m venv .venv
@@ -38,52 +20,72 @@ pnpm install --frozen-lockfile
 bun dev
 ```
 
-The launcher builds the required packages before starting the server. Open `http://127.0.0.1:8787`, then choose or drop a `.fig` file. After upload, the canvas fills the app beneath its header. Canvas, Inspect, Design tokens, Assets, Tools, and File information remain available from the header. Download either the standalone HTML or the extracted bundle ZIP.
+Open `http://127.0.0.1:8787` and drop a `.fig` file onto the page, or use **Open file**. The launcher builds the workspace before starting the app. Keep the Python environment active when starting Openfig so the renderer can use Pillow.
 
-Use another port or font directory when needed:
-
-```sh
-bun dev --port 8788 --fonts ./fonts
-```
-
-To run the server without rebuilding each time:
-
-```sh
-pnpm build
-pnpm run openfig -- serve
-```
-
-<details>
-<summary>Upload screen</summary>
-
-![Openfig file upload screen](docs/images/openfig-upload.png)
-
-</details>
-
-## Try an original demo
-
-After installing dependencies, generate a new demo file:
+To try it with the demo shown above:
 
 ```sh
 node scripts/create-demo.mjs --output .openfig/demo.fig
 ```
 
-Open it in the app, or convert it with the CLI. The generator creates a small bare `fig-kiwi` document with a workspace screen, a component board and a mobile screen. It refuses to replace an existing file. Screenshots use an optional local Inter installation; a fresh checkout uses system fallback fonts unless you supply a font manifest.
+Open the generated file in the app. The generator requires a new output path.
 
-## Convert or extract from the CLI
+<details>
+<summary>File upload screen</summary>
+
+![Choose or drop a local Figma file](docs/images/openfig-upload.png)
+
+</details>
+
+## Explore a design
+
+The **Canvas** view opens on the first screen. Pick another screen from the sidebar, search its layers, or select a component directly on the canvas. The Design panel shows its geometry, fills, typography and CSS.
+
+Scroll to pan. Hold Ctrl or Command while scrolling to zoom around the pointer. Space plus drag also pans; double-click a component to focus it. Click empty canvas or press Escape to clear the selection.
+
+The other views give you access to the extracted document:
+
+| View | Use it for |
+| --- | --- |
+| Inspect | Search nodes and read their properties or subtree context. |
+| Design tokens | Browse colors, typography, effects, required fonts and variables. |
+| Assets | Preview and download extracted image assets. |
+| Tools | Run document operations, attach reference images, compare PNGs or connect a coding assistant. |
+| File information | Read the source fingerprint, parser metadata and document structure. |
+
+**Download HTML** saves the interactive viewer with its embedded assets. **Download bundle** saves the extracted document and supporting files as a ZIP. Download either before stopping the server if you want to keep the result; uploaded sessions are temporary.
+
+## Convert from the command line
+
+After installation, build once if you haven't started the app:
+
+```sh
+pnpm build
+```
+
+Convert a design into an interactive HTML file:
 
 ```sh
 pnpm run openfig -- convert ./design.fig --output ./design.html
+```
+
+Or extract its nodes, images, vectors, tokens, variables and saved text geometry:
+
+```sh
 pnpm run openfig -- extract ./design.fig --output ./.openfig/design
 ```
 
-Conversion refuses to replace an existing output unless `--force` is supplied. Add `--fonts <directory>` to use a different font collection. The result reports the parser version, canvas variant, node count, source SHA-256, and HTML byte count.
+Conversion requires a new output file. Use `--force` to replace an existing export, or `--fonts ./fonts` to supply a font directory.
 
-The extracted bundle contains normalized nodes, images, vectors, style tokens, font requirements, variables, and saved glyph and command paths. It can be inspected through the CLI or used by the offline MCP server.
+To start the app on a different port without rebuilding:
 
-## Headless HTTP conversion
+```sh
+pnpm run openfig -- serve --port 8788
+```
 
-`POST /api/convert` accepts the raw `.fig` bytes and returns HTML directly:
+## Use the HTTP API
+
+With the app running, send the raw `.fig` bytes to `/api/convert`. The response is the exported HTML:
 
 ```sh
 curl --fail-with-body \
@@ -94,107 +96,70 @@ curl --fail-with-body \
   --output ./design.html
 ```
 
-For inspection and tool calls, create a document session instead:
+For repeated inspection, upload to `/api/documents` instead:
 
 ```sh
 curl --fail-with-body \
-  --header 'content-type: application/fig' \
   --header 'x-filename: design.fig' \
   --data-binary @./design.fig \
   http://127.0.0.1:8787/api/documents \
   --output ./document.json
 ```
 
-The HTTP 201 response includes `id`, `name`, `summary`, `previewUrl`, `downloadUrl`, `bundleUrl`, `metadataUrl`, and `mcpUrl`. The app uses this same endpoint.
+The JSON response includes a document `id` and URLs for its preview, downloads, metadata and assistant connection. Use that ID in the routes below:
 
-## Inspect a document through the same port
+| Request | Result |
+| --- | --- |
+| `GET /api/documents/:id/nodes?query=Button` | Search node names and text. |
+| `GET /api/documents/:id/nodes?reference=1:18` | Inspect a node by ID. |
+| `GET /api/documents/:id/tokens` | Read design tokens and variables. |
+| `GET /api/documents/:id/assets` | List extracted images and their download URLs. |
+| `GET /api/documents/:id/bundle` | Download the extracted bundle. |
+| `DELETE /api/documents/:id` | Remove the temporary document session. |
+| `GET /api/tools` | Discover supported operations, arguments and routes. |
 
-In these routes, `:id` is the document ID returned by upload.
+The default server listens on loopback and has no user authentication. Keep it local unless you provide access controls. Uploads are limited to 1 GiB by default; set `OPENFIG_MAX_UPLOAD_BYTES` to change that limit.
 
-| Method | Route | Result |
-| --- | --- | --- |
-| GET | `/healthz` | Server health |
-| GET | `/api/tools` | Routes, action fields, and local MCP tool names |
-| GET | `/api/documents` | Documents in this running server |
-| GET | `/api/documents/:id/metadata` | Source manifest and document URLs |
-| GET | `/api/documents/:id/nodes` | Frame list, name/text search, or bounded node inspection |
-| GET | `/api/documents/:id/context?reference=...` | Subtree context with tokens, assets, vectors, and references |
-| GET | `/api/documents/:id/tokens` | Colors, typography, effects, fonts, and variables |
-| GET | `/api/documents/:id/assets` | Extracted image list and download URLs |
-| GET | `/api/documents/:id/assets/:hash` | Original extracted image bytes |
-| GET | `/api/documents/:id/preview` | Interactive HTML preview |
-| GET | `/api/documents/:id/download` | Standalone HTML download |
-| GET | `/api/documents/:id/bundle` | Extracted bundle ZIP |
-| GET | `/api/documents/:id/files/:relativePath` | A file inside the extracted bundle |
-| POST | `/api/documents/:id/actions` | Structured CLI operation |
-| DELETE | `/api/documents/:id` | Remove this temporary document session |
-| POST | `/mcp/:id` | Local MCP over Streamable HTTP |
+## Connect a coding assistant
 
-Node search accepts `query`, `type`, and `limit`. Supplying `reference` instead selects bounded inspection, with optional `depth` and `maxChildren`. A node reference can be a node ID or Figma node URL.
+Openfig supports the Model Context Protocol (MCP), which lets coding assistants call tools against a design. Local tools can search layers, inspect components, read tokens, retrieve assets, export vector groups and compare a candidate image with an attached reference.
 
-Actions accept JSON with an `operation` field. Available operations are `resolve`, `inspect`, `inspect-node`, `search`, `pack`, `render`, `doctor`, `font-check`, `reference`, and `compare`. `GET /api/tools` supplies each operation's fields, and the app's Tools view provides a form for them. `font-check` uses the server's configured font directory. `render` exports vector groups as SVG.
+For an uploaded file, open **Tools**, then **Connect with MCP**. Copy the document's connection configuration into your MCP client. It uses the same port as the app.
 
-`reference` and `compare` take a node `reference` and PNG `imageBase64`. Attach a reference before comparing a candidate. Comparison accepts `threshold` and `maxMismatchRatio`, then returns pixel metrics and candidate/diff URLs. Its `candidatePath` can be passed to the MCP `review_visual_match` tool.
-
-## Sessions and resource use
-
-Uploaded document IDs belong to the running server. Reloading the page keeps them available; stopping the server loses the session list and removes its temporary files during graceful shutdown. Download the HTML or bundle ZIP to keep the result. Direct `/api/convert` requests clean up their temporary bundle after returning HTML.
-
-The server binds to `127.0.0.1` by default. It has no user authentication or configured conversion concurrency limit. Raw uploads default to a 1 GiB cap, configurable with `OPENFIG_MAX_UPLOAD_BYTES`. JSON action bodies are capped at 100 MiB; MCP request bodies at 2 MiB. Parsing retains source buffers or expanded archive entries in memory, and active document bundles occupy temporary disk space until removed or the server stops.
-
-## Canvas roots and fonts
-
-Visible pages prefer frame-like roots at least 280 pixels wide and 260 pixels high. Set `OPENFIG_MIN_SCREEN_WIDTH` and `OPENFIG_MIN_SCREEN_HEIGHT` to change those thresholds. If none qualify, the canvas uses all visible candidates. Candidate layers remain in the layer tree; a candidate omitted from the canvas cannot be focused there. Hidden pages retain visible candidates, and overlapping component boards use preview positions that preserve the original source matrices.
-
-Saved glyph outlines preserve available source text shapes without requiring those font binaries. Text without usable glyph geometry uses native browser text, where missing fonts can change shape and wrapping. Exported CSS also needs the specified fonts in its destination.
-
-Openfig embeds image assets and fonts listed in the selected font directory's `manifest.json`. The default collection is `packages/openfig/fonts/local/`, excluded from Git. Add licensed `.ttf`, `.otf`, `.woff`, or `.woff2` files and list their family, file, style, and weight. See [manifest.example.json](packages/openfig/fonts/manifest.example.json).
-
-## Local and hosted MCP
-
-The Tools view connects to the uploaded document's `mcpUrl` on the same port. The local tools inspect saved bundles and compare attached reference images. A CLI client can use stdio instead:
+For an extracted bundle, start a server over standard input and output:
 
 ```sh
-pnpm run openfig -- mcp --root ./.openfig/design
+node packages/openfig/src/cli.mjs mcp --root ./.openfig/design
 ```
 
-Figma account libraries, live selections, hosted workflows, and file writes require Figma's official service and authentication. The repository includes a project-scoped hosted entry in `.codex/config.toml`; `pnpm run openfig -- connect-figma` can register a hosted entry across Codex projects. [The MCP guide](docs/FIGMA-MCP.md) explains both transports and lists the official catalog.
+Saved-file tools work locally. Live Figma selections, account libraries and writes to Figma use its authenticated service. The [MCP guide](docs/FIGMA-MCP.md) covers client setup and the local and hosted tool catalogs.
 
-## Supported input
+## Fonts and rendering
 
-The parser accepts a ZIP containing `canvas.fig` with the `fig-kiwi` variant, or a bare `fig-kiwi` stream. Other variants and formats such as `.jam` and `.deck` are unsupported. Bare streams have no separate image entries or thumbnail; missing raster references produce an `IMAGE_ASSETS_UNAVAILABLE` bundle warning.
+Openfig uses saved glyph outlines when they're available. Text that falls back to browser rendering needs the corresponding fonts for matching shape and wrapping. Copied CSS also needs those fonts in the application where you use it.
 
-ZIP limits are 10,000 entries, 256 MiB per uncompressed entry, and 1 GiB total uncompressed data. Bare streams are capped at 1 GiB. The HTTP upload cap is separate from these parser limits.
+To embed fonts in an export, place licensed font files and a `manifest.json` in a font directory, then pass `--fonts` when starting the app or converting a file:
 
-## Repository layout
+```sh
+bun dev --fonts ./fonts
+pnpm run openfig -- convert ./design.fig --output ./design.html --fonts ./fonts
+```
 
-One app starts from the repository root. Its workspace packages share the same extraction and inspection flow.
+The manifest lists each font's family, file, style and weight. See the [example manifest](packages/openfig/fonts/manifest.example.json). The default directory, `packages/openfig/fonts/local/`, is excluded from Git. The demo screenshots use Inter, so fallback text can look different on a fresh checkout.
 
-| Path | Responsibility |
+Rendering can differ from Figma, including text, image sampling and effects. Check the screens that matter against the original design. The [fidelity guide](docs/FIDELITY.md) explains the comparison method and known limits.
+
+The parser accepts `fig-kiwi` streams, either bare or inside a `.fig` ZIP containing `canvas.fig`. Other variants, `.jam` and `.deck` files are unsupported. Bare streams lack the ZIP's separate image files, so referenced images may be unavailable.
+
+## How it works
+
+The core parser decodes the file's embedded schema into a document tree. The conversion pipeline resolves component instances, saved overrides, variable colors and geometry, then assembles selectable vector layers into one HTML viewer.
+
+| Directory | Role |
 | --- | --- |
-| `packages/core` | Binary decoding, normalized bundles, tokens, vectors and visual comparison |
-| `packages/cli` | The retained `figctx` extraction and inspection CLI |
-| `packages/mcp-server` | Local document tools over MCP |
-| `packages/openfig` | Conversion pipeline, SVG viewer, HTTP API and web app |
-| `scripts/dev.mjs` | Build and launch through `bun dev` |
-| `scripts/create-demo.mjs` | Original, reproducible demonstration input |
+| `packages/core` | File decoding, normalized bundles, tokens and visual comparison. |
+| `packages/cli` | Extraction and inspection commands. |
+| `packages/mcp-server` | Design tools for coding assistants. |
+| `packages/openfig` | Renderer, browser app and HTTP API. |
 
-[The process record](docs/PROCESS.md) documents the conversion flow, mistakes, rendering corrections, current sample evidence, and fidelity limits. [Third-party notices](THIRD-PARTY-NOTICES.md) records bundled licenses.
-
-## Rendering fidelity
-
-The retained measured rendering snapshot reaches **81.17% exact RGB (red, green and blue) pixels** and **99.33% with color tolerance**. Those are different measurements. Literal pixel perfection has not been reached.
-
-The snapshot predates the publication review changes to core extraction and sibling ordering; a new pixel score after those changes remains UNKNOWN. The benchmark covers 47 visible screens from one saved design, at device pixel ratio (DPR) 1 and matching native export dimensions. It excludes the hidden component preview, other files and arbitrary zoom. The [fidelity record](docs/FIDELITY.md) explains the method, improvements and rejected experiments. The [public numeric evidence](docs/evidence/fidelity-summary.json) retains per-screen measurements without redistributing the design or its images.
-
-## Attribution and licenses
-
-The local parser, extraction CLI and MCP code derive from `figctx`; their MIT notices are retained. The renderer uses the vendored Grida reader and canvas runtime under their respective MIT and Apache-2.0 licenses. [Third-party notices](THIRD-PARTY-NOTICES.md) lists the license files. This repository does not include a separate license grant for Openfig-specific code.
-
-## Reference: verification and limits
-
-VERIFIED. Startup and shared-port behavior are defined in [the launcher](scripts/dev.mjs), [server routes](packages/openfig/src/server.mjs), and [action catalog](packages/openfig/src/api.mjs). The [shared pipeline](packages/openfig/src/pipeline.mjs) handles CLI and API conversion. Screenshots show the original board authored by [the demo generator](scripts/create-demo.mjs). [Publication checks](docs/evidence/publication-checks.json) record a fresh no-font-manifest CLI/API conversion and local document/MCP requests after the core corrections.
-
-VERIFIED. The [measurement snapshot](docs/evidence/fidelity-summary.json) records pooled counts, per-screen results, source record hashes and the production HTML identity. Its `methods` field defines exact RGB, pixelmatch tolerance, backdrop and aggregation. Benchmark design files, private comparison images, the optional user font collection and generated research outputs are excluded from Git and retained locally.
-
-DRAFT. Fidelity for arbitrary designs and platforms remains UNKNOWN. Live Figma OAuth, account-specific tools and hosted resources were not verified by the local conversion checks. Conversion and zoom latency breakdowns remain UNKNOWN. The inherited package test commands reference Vitest without a declared dependency; this checkout does not establish a maintained automated regression suite.
+[Conversion process](docs/PROCESS.md) records the implementation and rendering corrections. [Third-party notices](THIRD-PARTY-NOTICES.md) lists the bundled code and font licenses, including the `figctx` parser and Grida runtime.
