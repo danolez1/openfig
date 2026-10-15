@@ -1,0 +1,16 @@
+{
+  "name": "@grida/canvas-wasm",
+  "version": "0.91.0-canary.22",
+  "description": "WASM bindings for Grida Canvas",
+  "homepage": "https://grida.co",
+  "license": "Apache-2.0",
+  "author": "Grida",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gridaco/grida.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js"
+}
